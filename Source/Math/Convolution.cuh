@@ -229,6 +229,12 @@ __global__ void kROIPoolingForward(const int nthreads,
 		// (n, c, ph, pw) is an element in the pooled output
 		// n is the global ROI index (the new batch index)
 
+        // cast roi data to float...make gcc happy:
+        float rx = (float)roi_data[0],
+              ry = (float)roi_data[1],
+              rw = (float)roi_data[2],
+              rh = (float)roi_data[3];
+
 		int roi_size = channels * pooled_height * pooled_width;
 		int n = index / roi_size;
 
@@ -241,10 +247,10 @@ __global__ void kROIPoolingForward(const int nthreads,
 		roi_data += n * 4;
 
 		// roi data is relative to original image size
-		int roi_start_w = ::round(roi_data[0] * width);
-		int roi_start_h = ::round(roi_data[1] * height);
-		int roi_width = (int)max(::round(roi_data[2] * width), 1.0);
-		int roi_height = (int)max(::round(roi_data[3] * height), 1.0);
+		int roi_start_w = roundf(rx * width);
+		int roi_start_h = roundf(ry * height);
+		int roi_width = (int)max(roundf(rw * width), 1.0);
+		int roi_height = (int)max(roundf(rh * height), 1.0);
 		
 		float winH = static_cast<float>(roi_height)
 			/ static_cast<float>(pooled_height);
@@ -252,13 +258,13 @@ __global__ void kROIPoolingForward(const int nthreads,
 			/ static_cast<float>(pooled_width);
 		
 		// compute window for this output location.
-		int hstart = static_cast<int>(floor(static_cast<float>(ph)
+		int hstart = static_cast<int>(floorf(static_cast<float>(ph)
 			* winH));
-		int wstart = static_cast<int>(floor(static_cast<float>(pw)
+		int wstart = static_cast<int>(floorf(static_cast<float>(pw)
 			* winW));
-		int hend = static_cast<int>(ceil(static_cast<float>(ph + 1)
+		int hend = static_cast<int>(ceilf(static_cast<float>(ph + 1)
 			* winH));
-		int wend = static_cast<int>(ceil(static_cast<float>(pw + 1)
+		int wend = static_cast<int>(ceilf(static_cast<float>(pw + 1)
 			* winW));
 		
 		// Add roi offsets and clip to input boundaries
@@ -335,11 +341,17 @@ __global__ void kROIPoolingBackward(const int nthreads,
 		for (int roi_n = roi_min; roi_n < roi_max; roi_n++) {
 			const ElemType* roi_offset = roi_data + roi_n * 4;
 
+            // cast roi data to float...make gcc happy:
+            float rx = (float)roi_offset[0],
+                ry = (float)roi_offset[1],
+                rw = (float)roi_offset[2],
+                rh = (float)roi_offset[3];
+
 			// roi data is relative to original image size
-			int roi_start_w = std::round(roi_offset[0] * width);
-			int roi_start_h = std::round(roi_offset[1] * height);
-			int roi_width = (int)max(std::round(roi_offset[2] * width), 1.0);
-			int roi_height = (int)max(std::round(roi_offset[3] * height), 1.0);
+			int roi_start_w = roundf(rx * width);
+			int roi_start_h = roundf(ry * height);
+			int roi_width = (int)max(roundf(rw * width), 1.0);
+			int roi_height = (int)max(roundf(rh * height), 1.0);
 
 			// skip this ROI if it doesn't contain our input location.
 			const bool in_roi = (w >= roi_start_w && w < roi_start_w + roi_width &&
@@ -355,10 +367,10 @@ __global__ void kROIPoolingBackward(const int nthreads,
 				/ static_cast<float>(pooled_width);
 
 			// what pooled nodes in the output for this ROI could have pooled this input location?
-			int phstart = floor(static_cast<float>(h - roi_start_h) / winH);
-			int phend = ceil(static_cast<float>(h - roi_start_h + 1) / winH);
-			int pwstart = floor(static_cast<float>(w - roi_start_w) / winW);
-			int pwend = ceil(static_cast<float>(w - roi_start_w + 1) / winW);
+			int phstart = floorf(static_cast<float>(h - roi_start_h) / winH);
+			int phend = ceilf(static_cast<float>(h - roi_start_h + 1) / winH);
+			int pwstart = floorf(static_cast<float>(w - roi_start_w) / winW);
+			int pwend = ceilf(static_cast<float>(w - roi_start_w + 1) / winW);
 
 			phstart = min(max(phstart, 0), pooled_height);
 			phend = min(max(phend, 0), pooled_height);
@@ -377,7 +389,6 @@ __global__ void kROIPoolingBackward(const int nthreads,
 					}
 				}
 			}
-
 		}
 		grad[index] = gradient;
 	}
