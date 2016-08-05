@@ -8,15 +8,10 @@ ndlMnistMacros = [
     imageW = 28
     imageH = 28
     labelDim = 10
-
-    roiDim = 50
-
     features = ImageInput(imageW, imageH, 1, imageLayout=$imageLayout$)
     featScale = Constant(0.00390625)
     featScaled = Scale(featScale, features)
     labels = InputValue(labelDim)
-    
-    rois = Input(roiDim, tag="feature")
 ]
 
 DNN=[

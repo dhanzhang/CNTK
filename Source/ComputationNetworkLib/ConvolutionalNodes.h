@@ -150,13 +150,8 @@ protected:
     PoolKind m_poolKind;
     bool m_transpose; // means de-convolution ...I think
     ImageLayoutKind m_imageLayout;
-
-	size_t m_outH;
-	size_t m_outW;
-
     size_t m_maxTempMemSizeInSamples;
     shared_ptr<Matrix<ElemType>> m_tempMatrix;
-
     std::unique_ptr<ConvolutionEngine<ElemType>> m_convEng;
 };
 
@@ -427,8 +422,11 @@ protected:
 
 // -----------------------------------------------------------------------
 // ROIPoolingNode (inputROIs, inputFeatures)
+// use adaptive pooling window for input regions of interest to pool to the same
+// output size. ROIs are input(0). inputFeatureMaps (infm) are Input(1).
+// ROIs should have dimension [ROI_size, ROIs_per_image, batch_size];
+// See http://arxiv.org/abs/1504.08083
 // -----------------------------------------------------------------------
-
 template <class ElemType>
 class ROIPoolingNode : public ComputationNode<ElemType>, public NumInputs<2>
 {
@@ -456,13 +454,6 @@ public:
 	{
 		AttachInputsFromConfig(configp, GetExpectedNumInputs());
 	}
-
-	// use adaptive pooling window
-	// for input ROIs. ROIs are input(0). inputFeatureMaps (infm) are Input(1).
-	// ROIs should have dimension [ROI_size, ROIs_per_image, batch_size];
-	// we loop over the bsz dimension and depending on the ROI shape use a different
-	// pooling window size. TODO: depending on the image shape, need to slice differently into the mb.
-	// depends on status of fully conv. for now only works with same-size minibatches.
 
 	void RequestMatricesBeforeForwardProp(MatrixPool& matrixPool) override
 	{
@@ -530,9 +521,7 @@ public:
 		
 		if (isFinalValidationPass && (inDims.m_width < m_outW || inDims.m_height < m_outH))
 			InvalidArgument("ROIPoolingNode: inputWidth must >= windowWidth and inputHeight must >= windowHeight.");
-
-
-		// hack for now...4D tensor.
+		// hack for use with LegacyReshape...4D tensor.
 		SetDims(TensorShape(m_outW, m_outH, inDims.m_numChannels, rois_per_image), HasMBLayout());
 	}
 

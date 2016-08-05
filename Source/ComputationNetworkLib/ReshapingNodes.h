@@ -249,9 +249,6 @@ public:
         // enforce compatibility of 'dataInput' with 'layoutInput'
         // TODO: how to deal with boundary flags?
 		if (*m_pMBLayout != *Input(0)->GetMBLayout()) { // this does a deep value-level comparison
-			auto dataLayout = Input(0)->GetMBLayout();
-			fprintf(stderr, "data layout pointer: %d %d %d\n", (int)(dataLayout->GetNumTimeSteps()), (int)(dataLayout->GetNumSequences()), (int)(dataLayout->GetNumParallelSequences()));
-			fprintf(stderr, "other layout pointer: %d %d %d\n", (int)(m_pMBLayout->GetNumTimeSteps()), (int)(m_pMBLayout->GetNumSequences()), (int)(m_pMBLayout->GetNumParallelSequences()));
 			InvalidArgument("%ls %ls operation discovered that %ls %ls operation produced an MB layout that is incompatible with that of %ls %ls.",
 				NodeName().c_str(), OperationName().c_str(),
 				Input(0)->NodeName().c_str(), Input(0)->OperationName().c_str(),

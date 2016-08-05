@@ -1521,9 +1521,6 @@ void GPUMatrix<ElemType>::Resize(const size_t numRows, const size_t numCols, boo
         SetBuffer(pArray, numElements * sizeof(ElemType));
         SetSizeAllocated(numElements);
 	}
-	else {
-		//fprintf(stderr, "reallocated size not big enough to do a resize: allocated size is %d\n", (int)GetSizeAllocated());
-	}	
     
     // success
     m_sliceViewOffset = 0;
@@ -3140,9 +3137,9 @@ void GPUMatrix<ElemType>::ROIPoolingForward(const int num_rois, const int img_co
 	SyncGuard syncGuard;
 
 	int count = num_rois * img_count * channels * pooled_height * pooled_width;
-	int nthreads = (int)floor((double)(count + 128 - 1) / 128);
-
-	kROIPoolingForward<<<nthreads, 128, 0, t_stream>>>(count, num_rois, img_count, channels, height, 
+    const int BlockSize = 128;
+	int nthreads = (int)floor((double)(count + BlockSize - 1) / 128);
+	kROIPoolingForward<<<nthreads, BlockSize, 0, t_stream>>>(count, num_rois, img_count, channels, height, 
 		width, pooled_height, pooled_width, Data(), roi_data.Data(), output.Data(), argmax.Data());
 }
 

@@ -4317,7 +4317,6 @@ void CPUMatrix<ElemType>::MaxPoolingBackward(const CPUMatrix<ElemType>& out, con
     }
 }
 
-
 template <class ElemType>
 void CPUMatrix<ElemType>::ROIPoolingForward(const int num_rois, const int img_count, const int channels, const int height, const int width,
 	const int pooled_height, const int pooled_width, const CPUMatrix<ElemType>& roi_data, CPUMatrix<ElemType>& output, CPUMatrix<ElemType>& argmax) const
@@ -4347,18 +4346,15 @@ void CPUMatrix<ElemType>::ROIPoolingForward(const int num_rois, const int img_co
 			int roi_w = (int)max(round(sc_w * width), 1.0);
 			int roi_h = (int)max(round(sc_h * height), 1.0);
 
-			//fprintf(stderr, "ROI %d: (X, Y, W, H) in infm: (%d, %d, %d, %d)\n", roi_idx, x, y, roi_w, roi_h);
-
 			const double winW = double(roi_w) / double(pooled_width);
 			const double winH = double(roi_h) / double(pooled_height);
 
-			// from Ross Girshick fast-rcnn caffe cpu
+			// from Ross Girshick fast-rcnn caffe cpu:
+            // https://github.com/rbgirshick/fast-rcnn
 			// loop over spatial locations in output.
 #pragma omp parallel for
 			for (int outw = 0; outw < pooled_width; outw++) {
 				for (int outh = 0; outh < pooled_height; outh++) {
-					//fprintf(stderr, "computing output spatial location %d %d\n", outw, outh);
-
 					// compute the top left corner of the input
 					// spatial window corresponding to this output unit
 					int hstart = (int)floor(double(outh)*winH);
@@ -4370,19 +4366,15 @@ void CPUMatrix<ElemType>::ROIPoolingForward(const int num_rois, const int img_co
 
 					// offset window based on ROI top left corner.
 					// these indices are into the input slice.
-					hstart = min(max(hstart + y, 0), height); // need - 1 here?
+					hstart = min(max(hstart + y, 0), height);
 					hend = min(max(hend + y, 0), height);
-					wstart = min(max(wstart + x, 0), width); // need - 1 here?
+					wstart = min(max(wstart + x, 0), width); 
 					wend = min(max(wend + x, 0), width);
-
-					//fprintf(stderr, "ROI window: (xmin ymin xmax ymax): (%d %d %d %d)\n", wstart, hstart, wend, hend);
 
 					bool isempty = (hend <= hstart) || (wend <= wstart);
 
 					for (int c = 0; c < channels; c++) {
-						//int output_idx = roi_idx*roi_output_size + c + (outh + outw*m_outH)*num_channels;
 						int output_idx = roi_idx * roi_output_size + outw + outh * pooled_width + c * pooled_height * pooled_width;
-						//fprintf(stderr, "going in output location %d\n", output_idx);
 						output(output_idx, img_idx) = -FLT_MAX;
 
 						if (isempty)
@@ -4391,7 +4383,6 @@ void CPUMatrix<ElemType>::ROIPoolingForward(const int num_rois, const int img_co
 						for (int h = hstart; h < hend; h++) {
 							for (int w = wstart; w < wend; w++) {
 								int data_idx = w + h*width + c*height*width;
-								//int data_idx = c + (h + w*input_h)*num_channels;
 								if (img(data_idx, 0) > output(output_idx, img_idx)) {
 									output(output_idx, img_idx) = img(data_idx, 0);
 									argmax(output_idx, img_idx) = (float)data_idx;
@@ -4405,21 +4396,23 @@ void CPUMatrix<ElemType>::ROIPoolingForward(const int num_rois, const int img_co
 	}
 }
 
-
 template <class ElemType>
 void CPUMatrix<ElemType>::ROIPoolingBackward(const int num_rois, const int img_count, const int channels, const int height, const int width,
 	const int pooled_height, const int pooled_width, const CPUMatrix<ElemType>& roi_data, CPUMatrix<ElemType>& grad, 
 	CPUMatrix<ElemType>& argmax) const
 {
-	int x = num_rois + img_count + channels + height + width + pooled_height + pooled_width;
-	if (0) {
-		roi_data.Print(nullptr);
-		grad.Print(nullptr);
-		argmax.Print(nullptr);
-		fprintf(stderr, "%d", x);
-	}
+    num_rois;
+    img_count;
+    channels;
+    height;
+    width;
+    pooled_height;
+    pooled_width;
+    roi_data;
+    grad;
+    argmax;
+    NOT_IMPLEMENTED;
 }
-
 
 template <class ElemType>
 void CPUMatrix<ElemType>::MaxUnpooling(const CPUMatrix<int>& mpRowCol, const CPUMatrix<int>& mpRowIndices,

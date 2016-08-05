@@ -281,9 +281,6 @@ cv::Rect CropTransformer::GetCropRect(CropType type, int viewIndex, int crow, in
     return cv::Rect(xOff, yOff, cropSizeX, cropSizeY);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 PadTransformer::PadTransformer(const ConfigParameters& config) : ImageTransformerBase(config)
 {
 	m_targetW = config(L"width");
@@ -328,12 +325,6 @@ void PadTransformer::Apply(size_t id, cv::Mat &mat)
 	cv::copyMakeBorder(mat, mat, top, bottom, left, right, m_borderType, m_value);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 ScaleSideTransformer::ScaleSideTransformer(const ConfigParameters& config) : ImageTransformerBase(config)
 {
 	m_target = config(L"target");
@@ -373,9 +364,6 @@ void ScaleSideTransformer::Apply(size_t id, cv::Mat &mat)
 
 	cv::resize(mat, mat, cv::Size(targetW, targetH), 0, 0, cv::INTER_LINEAR);
 }
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ScaleTransformer::ScaleTransformer(const ConfigParameters& config) : ImageTransformerBase(config)
 {

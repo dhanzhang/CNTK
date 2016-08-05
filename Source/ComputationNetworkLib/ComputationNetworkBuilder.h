@@ -65,8 +65,6 @@ public:
     ComputationNodePtr CreateAveragePoolingNode(const std::wstring& nodeName, const size_t windowWidth, const size_t windowHeight, const size_t horizontalSubsample, const size_t verticalSubsample, ImageLayoutKind imageLayoutKind);
 	ComputationNodePtr CreateROIPoolingNode(const std::wstring& nodeName, const size_t H, const size_t W, ImageLayoutKind imageLayoutKind);
 	ComputationNodePtr CreateReconcileDynamicAxisNode(const std::wstring& nodeName);
-
-
     // this is the catch-all for all cases not covered as special cases above
     // Unlike the specialized ones above, this one creates nodes by type given as a string.
     ComputationNodePtr CreateComputationNode(const std::wstring& nodeType, const std::wstring& nodeName);

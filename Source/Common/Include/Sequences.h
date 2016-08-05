@@ -965,7 +965,6 @@ static inline std::pair<size_t, size_t> ColumnRangeWithMBLayoutFor(size_t numCol
         if (fr.m_pMBLayout && pMBLayout && *fr.m_pMBLayout == *pMBLayout)
             LogicError("DataFor: FrameRange's dynamic axis is inconsistent with matrix. They are compatible though--are you missing a ReconcileDynamicAxis operation?");
 		else {
-			fprintf(stderr, "%d\t%d\n", (int)(fr.m_pMBLayout->GetNumTimeSteps()), (int)(pMBLayout->GetNumTimeSteps()));
 			LogicError("DataFor: FrameRange's dynamic axis is inconsistent with matrix.");
 		}
             
