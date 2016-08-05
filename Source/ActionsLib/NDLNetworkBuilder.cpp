@@ -262,16 +262,16 @@ void NDLNodeEvaluatorImpl<ElemType>::Evaluate(NDLNode<ElemType>* node, const wst
         }
     }
 
-	else if (cnNodeType == L"ReconcileDynamicAccess" /*OperationNameOf(ReshapeNode)*/)
-	{
-		nodeParamCount = 2;
-		nodeParamStart = 0;
+    else if (cnNodeType == L"ReconcileDynamicAccess" /*OperationNameOf(ReshapeNode)*/)
+    {
+        nodeParamCount = 2;
+        nodeParamStart = 0;
 
-		if (pass == ndlPassInitial)
-		{
-			nodePtr = builder.ReconcileDynamicAxis(NULL, NULL, name);
-		}
-	}
+        if (pass == ndlPassInitial)
+        {
+            nodePtr = builder.ReconcileDynamicAxis(NULL, NULL, name);
+        }
+    }
     else if (cnNodeType == OperationNameOf(PastValueNode) ||
              cnNodeType == OperationNameOf(FutureValueNode))
     {
@@ -499,29 +499,29 @@ void NDLNodeEvaluatorImpl<ElemType>::Evaluate(NDLNode<ElemType>* node, const wst
                                              horizontalSubsample, verticalSubsample, imageLayoutKind, name);
         }
     }
-	else if (cnNodeType == OperationNameOf(ROIPoolingNode))
-	{
+    else if (cnNodeType == OperationNameOf(ROIPoolingNode))
+    {
 
-		nodeParamCount = 2;
-		nodeParamStart = 0;
+        nodeParamCount = 2;
+        nodeParamStart = 0;
 
-		if (pass == ndlPassInitial)
-		{
+        if (pass == ndlPassInitial)
+        {
 
-			int id = 2; // skip inputValueNode and inputROINode
+            int id = 2; // skip inputValueNode and inputROINode
 
-			// evaluate only scalar parameters
-			vector<void*> params = EvaluateParameters(node, baseName, id, parameter.size() - id, pass);
+            // evaluate only scalar parameters
+            vector<void*> params = EvaluateParameters(node, baseName, id, parameter.size() - id, pass);
 
-			id = 0; // reset counter because the params array starts at zero
-			size_t H = ((NDLNode<ElemType>*) params[id++])->GetScalar();
-			size_t W = ((NDLNode<ElemType>*) params[id++])->GetScalar();
+            id = 0; // reset counter because the params array starts at zero
+            size_t H = ((NDLNode<ElemType>*) params[id++])->GetScalar();
+            size_t W = ((NDLNode<ElemType>*) params[id++])->GetScalar();
 
-			ImageLayoutKind imageLayoutKind = ImageLayoutKindFrom(node->GetOptionalParameter("imageLayout", "CHW"));
+            ImageLayoutKind imageLayoutKind = ImageLayoutKindFrom(node->GetOptionalParameter("imageLayout", "CHW"));
 
-			nodePtr = builder.ROIPooling(NULL, NULL, H, W, imageLayoutKind, name);
-		}
-	}
+            nodePtr = builder.ROIPooling(NULL, NULL, H, W, imageLayoutKind, name);
+        }
+    }
     else if (cnNodeType == OperationNameOf(BatchNormalizationNode))
     {
         if (parameter.size() != 5)

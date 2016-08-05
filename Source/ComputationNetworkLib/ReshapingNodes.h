@@ -248,12 +248,12 @@ public:
     {
         // enforce compatibility of 'dataInput' with 'layoutInput'
         // TODO: how to deal with boundary flags?
-		if (*m_pMBLayout != *Input(0)->GetMBLayout()) { // this does a deep value-level comparison
-			InvalidArgument("%ls %ls operation discovered that %ls %ls operation produced an MB layout that is incompatible with that of %ls %ls.",
-				NodeName().c_str(), OperationName().c_str(),
-				Input(0)->NodeName().c_str(), Input(0)->OperationName().c_str(),
-				Input(1)->NodeName().c_str(), Input(1)->OperationName().c_str());
-		}
+        if (*m_pMBLayout != *Input(0)->GetMBLayout()) { // this does a deep value-level comparison
+            InvalidArgument("%ls %ls operation discovered that %ls %ls operation produced an MB layout that is incompatible with that of %ls %ls.",
+                NodeName().c_str(), OperationName().c_str(),
+                Input(0)->NodeName().c_str(), Input(0)->OperationName().c_str(),
+                Input(1)->NodeName().c_str(), Input(1)->OperationName().c_str());
+        }
 
         // copy the data from 'dataInput'
         ValueFor(fr).AssignValuesOf(Input(0)->ValueFor(fr.WithLayout(Input(0)->GetMBLayout()))); // just propagate through

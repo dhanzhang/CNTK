@@ -1182,7 +1182,7 @@ template <class ElemType>
 void GPUMatrix<ElemType>::SetValue(const size_t numRows, const size_t numCols, int deviceId, ElemType* pArray, size_t matrixFlags)
 {
     // handle externally managed case
-	// BUGBUG: This is super super ugly, and needs to be fixed, but if matrixFlags has the right value, then we can't free anything,
+    // BUGBUG: This is super super ugly, and needs to be fixed, but if matrixFlags has the right value, then we can't free anything,
     // and everything gets wonky. This should be fixed, and would go away if it is made a shared_ptr.
     if (matrixFlags & matrixFlagDontOwnBuffer)
     {
@@ -1520,7 +1520,7 @@ void GPUMatrix<ElemType>::Resize(const size_t numRows, const size_t numCols, boo
 
         SetBuffer(pArray, numElements * sizeof(ElemType));
         SetSizeAllocated(numElements);
-	}
+    }
     
     // success
     m_sliceViewOffset = 0;
@@ -3131,30 +3131,30 @@ void GPUMatrix<ElemType>::MaxPoolingBackward(const GPUMatrix<ElemType>& out, con
 
 template <class ElemType>
 void GPUMatrix<ElemType>::ROIPoolingForward(const int num_rois, const int img_count, const int channels, const int height, const int width, 
-	const int pooled_height, const int pooled_width, const GPUMatrix<ElemType>& roi_data, GPUMatrix<ElemType>& output, GPUMatrix<ElemType>& argmax) const
+    const int pooled_height, const int pooled_width, const GPUMatrix<ElemType>& roi_data, GPUMatrix<ElemType>& output, GPUMatrix<ElemType>& argmax) const
 {	
-	PrepareDevice();
-	SyncGuard syncGuard;
+    PrepareDevice();
+    SyncGuard syncGuard;
 
-	int count = num_rois * img_count * channels * pooled_height * pooled_width;
+    int count = num_rois * img_count * channels * pooled_height * pooled_width;
     const int BlockSize = 128;
-	int nthreads = (int)floor((double)(count + BlockSize - 1) / 128);
-	kROIPoolingForward<<<nthreads, BlockSize, 0, t_stream>>>(count, num_rois, img_count, channels, height, 
-		width, pooled_height, pooled_width, Data(), roi_data.Data(), output.Data(), argmax.Data());
+    int nthreads = (int)floor((double)(count + BlockSize - 1) / 128);
+    kROIPoolingForward<<<nthreads, BlockSize, 0, t_stream>>>(count, num_rois, img_count, channels, height, 
+        width, pooled_height, pooled_width, Data(), roi_data.Data(), output.Data(), argmax.Data());
 }
 
 template <class ElemType>
 void GPUMatrix<ElemType>::ROIPoolingBackward(const int num_rois, const int img_count, const int channels, const int height, const int width,
-	const int pooled_height, const int pooled_width, const GPUMatrix<ElemType>& roi_data, GPUMatrix<ElemType>& grad, GPUMatrix<ElemType>& argmax) const
+    const int pooled_height, const int pooled_width, const GPUMatrix<ElemType>& roi_data, GPUMatrix<ElemType>& grad, GPUMatrix<ElemType>& argmax) const
 {
-	PrepareDevice();
-	SyncGuard syncGuard;
+    PrepareDevice();
+    SyncGuard syncGuard;
 
-	int count = img_count * channels * height * width;
-	int nthreads = (int)floor((double)(count + 128 - 1) / 128);
+    int count = img_count * channels * height * width;
+    int nthreads = (int)floor((double)(count + 128 - 1) / 128);
 
-	kROIPoolingBackward<<<nthreads, 128, 0, t_stream>>>(count, num_rois, img_count, channels, height,
-		width, pooled_height, pooled_width, Data(), roi_data.Data(), grad.Data(), argmax.Data());
+    kROIPoolingBackward<<<nthreads, 128, 0, t_stream>>>(count, num_rois, img_count, channels, height,
+        width, pooled_height, pooled_width, Data(), roi_data.Data(), grad.Data(), argmax.Data());
 }
 
 

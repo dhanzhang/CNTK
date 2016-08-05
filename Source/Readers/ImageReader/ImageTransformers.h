@@ -92,18 +92,18 @@ private:
 class PadTransformer : public ImageTransformerBase
 {
 public:
-	explicit PadTransformer(const ConfigParameters& config);
-	StreamDescription Transform(const StreamDescription& inputStream) override;
+    explicit PadTransformer(const ConfigParameters& config);
+    StreamDescription Transform(const StreamDescription& inputStream) override;
 
 private:
-	void Apply(size_t id, cv::Mat &mat) override;
-	double m_targetH;
-	double m_targetW;
-	double m_aspectRatio;
-	double m_targetMax;
-	double m_channels;
-	cv::Scalar m_value;
-	int m_borderType;
+    void Apply(size_t id, cv::Mat &mat) override;
+    double m_targetH;
+    double m_targetW;
+    double m_aspectRatio;
+    double m_targetMax;
+    double m_channels;
+    cv::Scalar m_value;
+    int m_borderType;
 };
 
 // scale either the minimum or maximum side to a certain
@@ -112,18 +112,18 @@ private:
 class ScaleSideTransformer : public ImageTransformerBase
 {
 public:
-	explicit ScaleSideTransformer(const ConfigParameters& config);
+    explicit ScaleSideTransformer(const ConfigParameters& config);
 
 private:
 
-	enum class Side
-	{
-		MIN = 0,
-		MAX = 1
-	};
-	void Apply(size_t id, cv::Mat &mat) override;
-	double m_target;
-	Side m_scaleSide;
+    enum class Side
+    {
+        MIN = 0,
+        MAX = 1
+    };
+    void Apply(size_t id, cv::Mat &mat) override;
+    double m_target;
+    Side m_scaleSide;
 };
 
 // Scale transformation of the image.
