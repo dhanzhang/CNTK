@@ -478,11 +478,8 @@ public:
 
 	void ForwardProp(const FrameRange& fr) override
 	{
-
 		// first dimension is roi_size (4) * rois/image, second is mb size
 		int rois_per_image = GetInputSampleLayout(0)[0] / 4;
-
-		//fprintf(stderr, "ROI_PER_IMAGE: %d\n", rois_per_image);
 
 		auto inputShape = GetInputSampleLayout(1);
 		Matrix<ElemType> inputSlice = Input(1)->ValueFor(fr);
@@ -494,21 +491,15 @@ public:
 		// input slice is c*h*w x bsz; cols are images.
 		// rois is rois_per_image*4 x bsz; cols are rois for different images.
 		// each ROI is (x, y, w, h) relative to original image size.
-
 		int input_w = inputShape[0];
 		int input_h = inputShape[1];
 		int num_channels = inputShape[2];
 
 		m_tempMatrix->Resize(m_outH * m_outW * num_channels * rois_per_image, inputSlice.GetNumCols());
 		m_tempMatrix->Reshape(m_outH * m_outW * num_channels * rois_per_image, inputSlice.GetNumCols());
-		//fprintf(stderr, "past temp resize/reshape\n");
-
-		// tempMatrix is used to store argmax data.
-		//m_argmaxData = Matrix<ElemType>::Zeros(m_outH * m_outW * num_channels * rois_per_image, inputSlice.GetNumCols(), m_deviceId);
 
 		inputSlice.ROIPoolingForward(rois_per_image, inputSlice.GetNumCols(), 
 			num_channels, input_h, input_w, m_outH, m_outW, ROIs, outputSlice, *m_tempMatrix);
-		//fprintf(stderr, "past fprop call");
 	}
 
 	void Save(File& fstream) const override
@@ -536,21 +527,13 @@ public:
 
 		if (isFinalValidationPass && m_imageLayout != ImageLayoutKind::CHW)
 			InvalidArgument("ROIPoolingNode only supports CHW image layout.");
-
-		//fprintf(stderr, "ROI in dims: W: %d, H: %d, C: %d\n", inDims.m_width, inDims.m_height, inDims.m_numChannels);
 		
 		if (isFinalValidationPass && (inDims.m_width < m_outW || inDims.m_height < m_outH))
 			InvalidArgument("ROIPoolingNode: inputWidth must >= windowWidth and inputHeight must >= windowHeight.");
 
-		// todo: this is technically the correct spatial dimension, but we are also increasing the 
-		// effective minibatch size to bsz * rois_per_image. so we may need a hack to make that work...
-		// not sure how to have different minibatch sizes at different parts of the network in CNTK.
-		// need to figure that out if we want to use softmax on top of pooled features rather than SVM.
-		//auto outDims = ImageDimensions(m_outW, m_outH, inDims.m_numChannels);
 
 		// hack for now...4D tensor.
 		SetDims(TensorShape(m_outW, m_outH, inDims.m_numChannels, rois_per_image), HasMBLayout());
-		//m_argmaxData = Matrix<ElemType>::Zeros(m_outW*m_outH*inDims.m_numChannels, 32, m_deviceId);
 	}
 
 	void BackpropTo(const size_t /*inputIndex*/, const FrameRange& fr) override
